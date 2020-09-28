@@ -36,6 +36,8 @@ namespace src.Controllers
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await formFile.CopyToAsync(stream);
+                        var oFXTransaction = new OFXTransaction();
+                        oFXTransaction.ReadOFXFileTransactions(filePath);
                     }
                 }
             }
