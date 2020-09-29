@@ -8,44 +8,45 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using src.Models;
+using src.Services;
 
 namespace src.Controllers
 {
     public class FileUploadController : Controller
     {
         private readonly ILogger<FileUploadController> _logger;
+        private readonly OFXTransactionService _oFXTransactionService;
 
-        public FileUploadController(ILogger<FileUploadController> logger)
+
+        public FileUploadController(ILogger<FileUploadController> logger, OFXTransactionService oFXTransactionService)
         {
             _logger = logger;
+            _oFXTransactionService = oFXTransactionService;
         }
 
         [HttpPost("FileUpload")]
         public async Task<IActionResult> Index(List<IFormFile> files)
         {
-            long size = files.Sum(f => f.Length);
-                        
             var filePaths = new List<string>();
             foreach (var formFile in files)
             {
+                List<OFXTransactionModel> transactionsList = new List<OFXTransactionModel>();
                 if (formFile.Length > 0)
                 {
                     // full path to file in temp location
-                    var filePath = Path.GetTempFileName(); //we are using Temp file name just for the example. Add your own file path.
+                    var filePath = Path.GetTempFileName();
                     filePaths.Add(filePath);
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await formFile.CopyToAsync(stream);
-                        var oFXTransaction = new OFXTransaction();
-                        oFXTransaction.ReadOFXFileTransactions(filePath);
+                        stream.Close();
                     }
+                    transactionsList = _oFXTransactionService.ReadOFXFileTransactions(filePath);
+                    _oFXTransactionService.AddOFXTransactions(transactionsList);
                 }
             }
-            // process uploaded files
-            // Don't rely on or trust the FileName property without validation.
-            //return Ok(new { count = files.Count, size, filePaths });
-            //return View("Home");
-            return View("~/Views/Home/Index.cshtml"); 
+
+            return View("~/Views/Home/Index.cshtml",await _oFXTransactionService.getTransactions());
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

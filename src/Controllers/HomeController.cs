@@ -6,21 +6,24 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using src.Models;
+using src.Services;
 
 namespace src.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly OFXTransactionService _oFXTransactionService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, OFXTransactionService oFXTransactionService)
         {
             _logger = logger;
+            _oFXTransactionService = oFXTransactionService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            return View(await _oFXTransactionService.getTransactions());
         }
 
         public IActionResult Privacy()

@@ -1,10 +1,11 @@
-﻿@{
+﻿@model IEnumerable<src.Models.OFXTransactionModel>
+@{
     ViewData["Title"] = "Bank Page";
 }
 
 <div class="card">
   <div class="card-header">
-    Upload OFX files
+    Upload OFX files - Reconcile the bank statement
   </div>
   <div class="card-body">
     <form method="post" enctype="multipart/form-data" asp-controller="FileUpload" asp-action="Index">
@@ -32,30 +33,33 @@
         <thead>
             <tr>
             <th scope="col">#</th>
-            <th scope="col">First</th>
-            <th scope="col">Last</th>
-            <th scope="col">Handle</th>
+            <th scope="col">Transactiont Type</th>
+            <th scope="col">Date</th>
+            <th scope="col">Transaction Amount</th>
+            <th scope="col">Description</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>mdo</td>
-            </tr>
-            <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>fat</td>
-            </tr>
-            <tr>
-            <th scope="row">3</th>
-            <td>Larry</td>
-            <td>the Bird</td>
-            <td>twitter</td>
-            </tr>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(ModelItem => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TransactiontType)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PostedDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TransactionAmount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
   </div>
